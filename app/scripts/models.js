@@ -8,13 +8,18 @@ define(['marionette', 'underscore'], function(marionette, _) {
             'start': 0,
             'end': 0
         },
+        fmtZeros: function(num, len) {
+            var str = '000' + num;
+            var slen = str.length;
+            return str.slice(slen - len, slen);
+        },
         startToString: function() {
             var model = this.toJSON();
             var millis = model.start % 1000;
             var secs = model.start % (1000 * 60);
             return _.template(this.template, {
-                'millis': millis,
-                'secs': secs
+                'millis': this.fmtZeros(millis, 3),
+                'secs': this.fmtZeros(secs, 2)
             }, {
                 variable: 'args'
             });
