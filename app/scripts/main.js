@@ -1,3 +1,4 @@
+'use strict';
 require.config({
     paths: {
         jquery: '../components/jquery/jquery',
@@ -11,7 +12,7 @@ require.config({
     },
     shim: {
         backbone: {
-            deps: ['underscore','jquery'],
+            deps: ['underscore', 'jquery'],
             exports: 'Backbone'
         },
         'backbone.augment': {
@@ -36,8 +37,7 @@ require.config({
     }
 });
 
-require(['app', 'jquery', 'bootstrap', 'underscore', 'backbone', 'backbone.augment', 'backbone.wreqr', 'marionette', 'backbone.babysitter'], function (app, $) {
-    'use strict';
+require(['app', 'jquery', 'bootstrap', 'underscore', 'backbone', 'backbone.augment', 'backbone.wreqr', 'marionette', 'backbone.babysitter'], function(app, $) {
     // use app here
     console.log(app);
     window.app = app;

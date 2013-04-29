@@ -1,7 +1,9 @@
 /*global define, Backbone */
-define(['marionette', './views'], function (marionette, uilib) {
+define(['marionette', 'views', 'models'], function(marionette, uilib, models) {
     'use strict';
     var SrtApp = new Backbone.Marionette.Application();
+    SrtApp.lib = uilib;
+    SrtApp.model = models;
     SrtApp.addRegions({
         navbar: uilib.regions.NavRegion
     });

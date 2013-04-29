@@ -19,7 +19,7 @@ require.config({
     },
     shim: {
         backbone: {
-            deps: ['underscore','jquery'],
+            deps: ['underscore', 'jquery'],
             exports: 'Backbone'
         },
         'backbone.augment': {
@@ -44,7 +44,7 @@ require.config({
     }
 });
 
-require(['app', 'jquery', 'require', 'chai', 'mocha', 'bootstrap', 'underscore', 'backbone', 'backbone.augment', 'backbone.wreqr', 'marionette', 'backbone.babysitter'], function (app, $, require, chai) {
+require(['app', 'jquery', 'require', 'chai', 'mocha', 'bootstrap', 'underscore', 'backbone', 'backbone.augment', 'backbone.wreqr', 'marionette', 'backbone.babysitter'], function(app, $, require, chai) {
     // use app here
     console.log(app);
     window.app = app;
@@ -53,9 +53,7 @@ require(['app', 'jquery', 'require', 'chai', 'mocha', 'bootstrap', 'underscore',
     chai.should();
     mocha.setup('bdd');
 
-    require([
-        'spec/test.js'
-    ], function() {
+    require(['spec/test.js'], function() {
         mocha.run();
     });
 });

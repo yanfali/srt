@@ -1,8 +1,8 @@
 /*global define, Backbone */
-define(['marionette'], function () {
+define(['marionette'], function() {
     'use strict';
     var navBarView = Backbone.Marionette.View.extend({
-        initialize: function(){
+        initialize: function() {
             console.log('init NavBarView');
         },
         events: {
@@ -22,9 +22,13 @@ define(['marionette'], function () {
             view.setElement($nav[0]);
         }
     });
+    var mainPane = Backbone.Marionette.Region.extend({
+        el: '#workarea'
+    });
     var lib = {
         'regions': {
-            NavRegion: navRegion
+            NavRegion: navRegion,
+            WorkArea: mainPane
         },
         'views': {
             NavBarView: navBarView
