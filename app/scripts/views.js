@@ -23,12 +23,12 @@ define(['marionette'], function () {
         }
     });
     var lib = {
-	    'regions': {
-		    NavRegion: navRegion
-	    },
+        'regions': {
+            NavRegion: navRegion
+        },
         'views': {
-		    NavBarView: navBarView
-	    }
+            NavBarView: navBarView
+        }
     };
     return lib;
 });
