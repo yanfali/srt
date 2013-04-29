@@ -40,5 +40,6 @@ require(['app', 'jquery', 'bootstrap', 'underscore', 'backbone', 'backbone.augme
     'use strict';
     // use app here
     console.log(app);
+    window.app = app;
     console.log('Running jQuery %s', $().jquery);
 });
