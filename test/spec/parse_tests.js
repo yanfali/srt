@@ -2,9 +2,9 @@
 /* jshint multistr: true */
 'use strict';
 
-var dataset = [ '1\r\n', '00:00:00,242 --> 00:00:03,703\r\n', 'Book One: Water | Chapter Twenty:\r\n', 'The Siege of the North Part 2\r\n', '\r\n', '\r\n', '\r\n', '0\r\n', '00:00:00,242 --> 00:00:03,703\r\n', 'weird junk on the end\r\n' ];
+var dataset = [ '1', '00:00:00,242 --> 00:00:03,703', 'Book One: Water | Chapter Twenty:', 'The Siege of the North Part 2', '', '', '', '0', '00:00:00,242 --> 00:00:03,703', 'weird junk on the end' ];
 
-var datasetBad = [ '1\r\n' ];
+var datasetBad = [ '1' ];
 var datasetEmpty = [ ];
 
 

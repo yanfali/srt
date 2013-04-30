@@ -1,7 +1,7 @@
 /*global define,$, setTimeout */
 define(['marionette', 'underscore', 'models'], function(m, _, models) {
     'use strict';
-    var EOL = '\r\n',
+    var EOL = '',
         lineRegex = /^\d+$/,
         timestampRegex = (/(\d{2}:\d{2}:\d{2},\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2},\d{3})/),
         srt, tsToMs = models.Subtitle.prototype.timestampToMillis,
@@ -34,7 +34,6 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
             inSrt = false;
             for (i = 0; i < nolines; i++) {
                 line = strings[i];
-                line = line.length > 2 ? line.substring(0, line.length - 2) : line;
                 console.log('line ' + i + ' @ ' + (line || ''));
                 if ((!inSrt) && lineRegex.test(line)) {
                     inSrt = true;
@@ -42,7 +41,7 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
                     obj.lineno = line;
                     continue;
                 }
-                if (line === '\r\n') {
+                if (line === '') {
                     collection.add({
                         'text': obj.text,
                         'start': obj.start,
