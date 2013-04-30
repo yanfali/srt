@@ -3,7 +3,7 @@
 define(function(require) {
     var models = require('models');
     (function() {
-        describe('Subtitle model tests', function() {
+        describe('Subtitle model millis to timestamp tests', function() {
             describe('startToString output', function() {
                 it('default values', function() {
                     var subtitle = new models.Subtitle();
@@ -45,6 +45,45 @@ define(function(require) {
                     subtitle.fmtZeros(0,3).should.equal('000');
                     subtitle.fmtZeros(0,2).should.equal('00');
                     subtitle.fmtZeros(0,1).should.equal('0');
+                });
+            });
+        });
+    })();
+
+    (function() {
+        describe('Subtitle model timestamp to millis tests', function() {
+            describe('millisToString output', function() {
+                it('default values', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('00:00:00,000').should.equal(0);
+                });
+                it('999ms', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('00:00:00,999').should.equal(999);
+                });
+                it('1s', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('00:00:01,000').should.equal(1000);
+                });
+                it('59s 999ms', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('00:00:59,999').should.equal(59999);
+                });
+                it('1m', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('00:01:00,000').should.equal(60000);
+                });
+                it('59m 59s 999ms', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('00:59:59,999').should.equal(3599999);
+                });
+                it('1h', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('01:00:00,000').should.equal(3600000);
+                });
+                it('10h', function() {
+                    var subtitle = new models.Subtitle();
+                    subtitle.timestampToMillis('10:00:00,000').should.equal(36000000);
                 });
             });
         });
