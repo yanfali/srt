@@ -15,7 +15,8 @@ require.config({
         'chai': 'test/lib/chai',
         'app': 'app/scripts/app',
         'views': 'app/scripts/views',
-        'models': 'app/scripts/models'
+        'models': 'app/scripts/models',
+        'parse': 'app/scripts/parse'
     },
     shim: {
         backbone: {
@@ -53,7 +54,7 @@ require(['app', 'jquery', 'require', 'chai', 'mocha', 'bootstrap', 'underscore',
     chai.should();
     mocha.setup('bdd');
 
-    require(['spec/model_tests.js'], function() {
+    require(['spec/model_tests.js', 'spec/parse_tests.js'], function() {
         mocha.run();
     });
 });
