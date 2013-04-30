@@ -53,7 +53,7 @@ require(['app', 'jquery', 'require', 'chai', 'mocha', 'bootstrap', 'underscore',
     chai.should();
     mocha.setup('bdd');
 
-    require(['spec/test.js'], function() {
+    require(['spec/model_tests.js'], function() {
         mocha.run();
     });
 });
