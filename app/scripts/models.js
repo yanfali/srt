@@ -16,13 +16,15 @@ define(['marionette', 'underscore'], function(marionette, _) {
         SECONDS_WIDTH = 2,
         MILLIS_WIDTH = 3;
     var tsConv = [
-        [ HOUR_OFFSET, HOUR_OFFSET + HOURS_WIDTH, HOURS_AS_MILLIS ],
-        [ MINUTE_OFFSET, MINUTE_OFFSET + MINUTES_WIDTH, MINUTE_AS_MILLIS ],
-        [ SECOND_OFFSET, SECOND_OFFSET + SECONDS_WIDTH, MILLIS_IN_SECOND ],
-        [ MILLI_OFFSET, MILLI_OFFSET + MILLIS_WIDTH, 1 ]
+        [HOUR_OFFSET, HOUR_OFFSET + HOURS_WIDTH, HOURS_AS_MILLIS],
+        [MINUTE_OFFSET, MINUTE_OFFSET + MINUTES_WIDTH, MINUTE_AS_MILLIS],
+        [SECOND_OFFSET, SECOND_OFFSET + SECONDS_WIDTH, MILLIS_IN_SECOND],
+        [MILLI_OFFSET, MILLI_OFFSET + MILLIS_WIDTH, 1]
     ];
     var subtitle = Backbone.Model.extend({
-        template: '<%= args.hours %>:<%= args.mins %>:<%= args.secs %>,<%= args.millis %>',
+        template: _.template('<%= args.hours %>:<%= args.mins %>:<%= args.secs %>,<%= args.millis %>', null, {
+            variable: 'args'
+        }),
         defaults: {
             'text': '',
             'start': 0,
@@ -45,13 +47,11 @@ define(['marionette', 'underscore'], function(marionette, _) {
             secs = ms >= MILLIS_IN_SECOND ? (ms / MILLIS_IN_SECOND) % SECONDS_IN_MINUTE : 0;
             minutes = ms >= MINUTE_AS_MILLIS ? (ms / MINUTE_AS_MILLIS) % MINUTES_IN_HOUR : 0;
             hours = ms >= HOURS_AS_MILLIS ? (ms / HOURS_AS_MILLIS) % HOURS_IN_DAY : 0;
-            return _.template(this.template, {
+            return this.template({
                 'hours': this.fmtZeros(hours, HOURS_WIDTH),
                 'mins': this.fmtZeros(minutes, MINUTES_WIDTH),
                 'secs': this.fmtZeros(secs, SECONDS_WIDTH),
                 'millis': this.fmtZeros(millis, MILLIS_WIDTH)
-            }, {
-                variable: 'args'
             });
         },
         timestampToMillis: function(timestamp) {
