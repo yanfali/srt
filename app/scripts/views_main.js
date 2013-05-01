@@ -1,5 +1,5 @@
 /*global define, Backbone, escape, _ */
-define(['marionette', 'models', 'parse'], function(marionette, models, parse) {
+define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(marionette, models, parse, subtitle) {
     'use strict';
     var mainRegion = Backbone.Marionette.Region.extend({
         el: '#workarea',
@@ -9,8 +9,9 @@ define(['marionette', 'models', 'parse'], function(marionette, models, parse) {
             view.setElement($nav[0]);
         }
     });
-    var mainView = Backbone.Marionette.View.extend({
+    var mainView = Backbone.Marionette.CollectionView.extend({
         collection: new models.Subtitles(),
+        itemView: subtitle.SubtitleView,
         ullist: '<ul><%= args.listitems %></ul>',
         listitem: '<li><%= args.name %> - <%= args.type %> - <%= args.size %></li>',
         events: {
