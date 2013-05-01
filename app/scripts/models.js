@@ -24,7 +24,7 @@ define(['marionette', 'underscore'], function(marionette, _) {
         [SECOND_OFFSET, SECOND_OFFSET + SECONDS_WIDTH, MILLIS_IN_SECOND],
         [MILLI_OFFSET, MILLI_OFFSET + MILLIS_WIDTH, 1]
     ];
-    var subtitle = Backbone.Model.extend({
+    var Subtitle = Backbone.Model.extend({
         template: _.template('<%= args.hours %>:<%= args.mins %>:<%= args.secs %>,<%= args.millis %>', null, {
             variable: 'args'
         }),
@@ -36,7 +36,7 @@ define(['marionette', 'underscore'], function(marionette, _) {
         fmtZeros: function(num, len) {
             var str = '000' + num,
                 slen = str.length;
-            return str.slice(slen - len, slen);
+            return str.substring(slen - len, slen);
         },
         startToString: function() {
             return this.millisToString(this.get('start'));
@@ -60,13 +60,17 @@ define(['marionette', 'underscore'], function(marionette, _) {
         timestampToMillis: function(timestamp) {
             var result = 0;
             for (var i = tsConv.length-1, row = tsConv[i]; i > -1; row = tsConv[--i]) {
-                result += parseInt(timestamp.slice(row[OFFSET1], row[OFFSET2]), 10) * row[MULTIPLIER];
+                result += parseInt(timestamp.substring(row[OFFSET1], row[OFFSET2]), 10) * row[MULTIPLIER];
             }
             return result;
         }
     });
+    var Subtitles = Backbone.Collection.extend({
+        model: Subtitle
+    });
     var lib = {
-        Subtitle: subtitle
+        'Subtitle': Subtitle,
+        'Subtitles': Subtitles
     };
     return lib;
 });
