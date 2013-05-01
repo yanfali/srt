@@ -4,7 +4,8 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
     var EOL = '\r\n',
         lineRegex = /^\d+$/,
         timestampRegex = (/(\d{2}:\d{2}:\d{2},\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2},\d{3})/),
-        srt, tsToMs = models.Subtitle.prototype.timestampToMillis, lib;
+        srt, tsToMs = models.Subtitle.prototype.timestampToMillis,
+        lib;
     srt = function(strings, collection) {
         var d = $.Deferred(),
             inner;
@@ -27,7 +28,9 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
                 return;
             }
 
-            obj = {};
+            obj = {
+                text: []
+            };
             inSrt = false;
             for (i = 0; i < nolines; i++) {
                 line = strings[i];
@@ -39,29 +42,25 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
                     obj.lineno = line;
                     continue;
                 }
-                if (inSrt) {
-                    if (line === '\r\n') {
-                        collection.add({
-                            'text': obj.text,
-                            'start': obj.start,
-                            'end': obj.end
-                        });
-                        obj = {};
-                        inSrt = false;
-                        continue;
-                    }
-                    matches = timestampRegex.exec(line);
-                    if (matches) {
-                        obj.start = tsToMs(matches[1]);
-                        obj.end = tsToMs(matches[2]);
-                        continue;
-                    }
-                    if (obj.text) {
-                        obj.text.push(line);
-                    } else {
-                        obj.text = [line];
-                    }
+                if (line === '\r\n') {
+                    collection.add({
+                        'text': obj.text,
+                        'start': obj.start,
+                        'end': obj.end
+                    });
+                    obj = {
+                        text: []
+                    };
+                    inSrt = false;
+                    continue;
                 }
+                matches = timestampRegex.exec(line);
+                if (matches) {
+                    obj.start = tsToMs(matches[1]);
+                    obj.end = tsToMs(matches[2]);
+                    continue;
+                }
+                obj.text.push(line);
             }
             d.resolve(nolines, collection);
         };
