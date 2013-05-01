@@ -6,9 +6,11 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     SrtApp.model = models;
     SrtApp.parse = parse;
     SrtApp.addRegions({
-        navbar: uilib.regions.NavRegion
+        navbar: uilib.regions.NavRegion,
+        workarea: uilib.regions.MainRegion
     });
     SrtApp.navbar.show(new uilib.views.NavBarView());
+    SrtApp.workarea.show(new uilib.views.WorkAreaView());
     return SrtApp;
 });
 
