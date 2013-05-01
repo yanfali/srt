@@ -37,6 +37,10 @@ define(function(require) {
                     var subtitle = new models.Subtitle({start: 4333});
                     subtitle.startToString().should.equal('00:00:04,333');
                 });
+                it('11:11:11,111', function() {
+                    var subtitle = new models.Subtitle({start: 40271111});
+                    subtitle.startToString().should.equal('11:11:11,111');
+                });
             });
         });
     })();
