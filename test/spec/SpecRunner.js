@@ -18,6 +18,7 @@ require.config({
         'views_nav': 'app/scripts/views_nav',
         'views_main': 'app/scripts/views_main',
         'views_subtitle': 'app/scripts/views_subtitle',
+        'views_playback': 'app/scripts/views_playback',
         'models': 'app/scripts/models',
         'parse': 'app/scripts/parse'
     },
