@@ -1,4 +1,4 @@
-/*global define, Backbone */
+/*global define, Backbone, $ */
 define(['marionette', 'models', 'views_subtitle'], function() {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
@@ -13,10 +13,33 @@ define(['marionette', 'models', 'views_subtitle'], function() {
         events: {
             'click .controls': 'handleClick'
         },
+        ui: {
+            timer: '.timer',
+            playtext: '.play-text'
+        },
         handleClick: function(e) {
             e.stopPropagation();
             e.preventDefault();
-            console.log(e.target);
+            var $target = $(e.target);
+            if ($target.is('a.btn\\ play') || $target.is('i.icon-play')) {
+                console.log('play');
+            }
+            if ($target.is('a.btn\\ stop') || $target.is('i.icon-stop')) {
+                console.log('stop');
+            }
+            if ($target.is('a.btn\\ step-backward') || $target.is('i.icon-step-backward')) {
+                console.log('back');
+            }
+            if ($target.is('a.btn\\ step-forward') || $target.is('i.icon-step-forward')) {
+                console.log('forward');
+            }
+        },
+        initialize: function(opts) {
+            if (opts.collection) {
+                this.collection = opts.collection;
+            } else {
+                throw new Error('Need a collection!');
+            }
         }
     });
     var lib = {
