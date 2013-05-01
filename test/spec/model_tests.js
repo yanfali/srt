@@ -33,6 +33,10 @@ define(function(require) {
                     var subtitle = new models.Subtitle({start: 3600000});
                     subtitle.startToString().should.equal('01:00:00,000');
                 });
+                it('remove mantissa', function() {
+                    var subtitle = new models.Subtitle({start: 4333});
+                    subtitle.startToString().should.equal('00:00:04,333');
+                });
             });
         });
     })();

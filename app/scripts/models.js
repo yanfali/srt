@@ -29,7 +29,7 @@ define(['marionette', 'underscore'], function(marionette, _) {
             variable: 'args'
         }),
         defaults: {
-            'text': '',
+            'text': [],
             'start': 0,
             'end': 0
         },
@@ -47,9 +47,13 @@ define(['marionette', 'underscore'], function(marionette, _) {
         millisToString: function(ms) {
             var millis, secs, minutes, hours;
             millis = ms % MILLIS_IN_SECOND;
+            millis = Math.floor(millis);
             secs = ms >= MILLIS_IN_SECOND ? (ms / MILLIS_IN_SECOND) % SECONDS_IN_MINUTE : 0;
+            secs = Math.floor(secs);
             minutes = ms >= MINUTE_AS_MILLIS ? (ms / MINUTE_AS_MILLIS) % MINUTES_IN_HOUR : 0;
+            minutes = Math.floor(minutes);
             hours = ms >= HOURS_AS_MILLIS ? (ms / HOURS_AS_MILLIS) % HOURS_IN_DAY : 0;
+            hours = Math.floor(hours);
             return this.template({
                 'hours': this.fmtZeros(hours, HOURS_WIDTH),
                 'mins': this.fmtZeros(minutes, MINUTES_WIDTH),

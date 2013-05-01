@@ -15,6 +15,9 @@ require.config({
         'chai': 'test/lib/chai',
         'app': 'app/scripts/app',
         'views': 'app/scripts/views',
+        'views_nav': 'app/scripts/views_nav',
+        'views_main': 'app/scripts/views_main',
+        'views_subtitle': 'app/scripts/views_subtitle',
         'models': 'app/scripts/models',
         'parse': 'app/scripts/parse'
     },
