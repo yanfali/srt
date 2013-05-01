@@ -7,10 +7,13 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     SrtApp.parse = parse;
     SrtApp.addRegions({
         navbar: uilib.regions.NavRegion,
-        workarea: uilib.regions.MainRegion
+        workarea: uilib.regions.MainRegion,
+        playback: uilib.regions.PlaybackRegion
     });
     SrtApp.navbar.show(new uilib.views.NavBarView());
-    SrtApp.workarea.show(new uilib.views.WorkAreaView());
+    var subtitles = new models.Subtitles();
+    SrtApp.workarea.show(new uilib.views.WorkAreaView({collection: subtitles}));
+    SrtApp.playback.show(new uilib.views.PlayerView({collection: subtitles}));
     return SrtApp;
 });
 

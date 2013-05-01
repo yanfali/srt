@@ -26,13 +26,7 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 	overflow: auto;
 	white-space: nowrap;
 }
-.start {
-	vertical-align: top;
-	display: inline-block;
-	margin: 0.25em 1em 2px 0;
-}
-
-.end{
+.start, .end {
 	vertical-align: top;
 	display: inline-block;
 	margin: 0.25em 1em 2px 0;
@@ -40,4 +34,19 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 .text{
 	display: inline-block;
 	margin: 0.25em 0 2px 0;
+}
+#playback.well {
+	background-color: #000;
+	font-size: 1.5em;
+	height: 6em;
+}
+.timer {
+	vertical-align: middle;
+	margin: 0 1em 0 1em;
+}
+.play-text {
+	color: #ffe600;
+}
+.player .controls {
+
 }

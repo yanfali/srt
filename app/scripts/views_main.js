@@ -10,7 +10,6 @@ define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(ma
         }
     });
     var mainView = Backbone.Marionette.CollectionView.extend({
-        collection: new models.Subtitles(),
         itemView: subtitle.SubtitleView,
         ullist: '<ul><%= args.listitems %></ul>',
         listitem: '<li><%= args.name %> - <%= args.type %> - <%= args.size %></li>',
