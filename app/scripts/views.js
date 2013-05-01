@@ -1,5 +1,5 @@
 /*global define */
-define(['views_nav', 'views_main'], function(nav, main) {
+define(['views_nav', 'views_main', 'views_subtitle'], function(nav, main, subtitle) {
     'use strict';
     var lib = {
         'regions': {
@@ -8,7 +8,8 @@ define(['views_nav', 'views_main'], function(nav, main) {
         },
         'views': {
             NavBarView: nav.NavBarView,
-            WorkAreaView: main.WorkAreaView
+            WorkAreaView: main.WorkAreaView,
+            SubtitleView: subtitle.SubtitleView
         }
     };
     return lib;
