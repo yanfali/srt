@@ -4,18 +4,18 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
     var EOL = '\r\n',
         lineRegex = /^\d+$/,
         timestampRegex = (/(\d{2}:\d{2}:\d{2},\d{3})\s+-->\s+(\d{2}:\d{2}:\d{2},\d{3})/),
-        srt, tsToMs = models.Subtitle.prototype.timestampToMillis;
+        srt, tsToMs = models.Subtitle.prototype.timestampToMillis, lib;
     srt = function(strings, collection) {
         var d = $.Deferred(),
             inner;
         inner = function() {
-            var nolines, foundrealend;
+            var nolines, foundrealend, i, obj, inSrt, matches, line;
             if (collection && collection.models) {
                 console.log('Got a collection with models in it');
             }
             nolines = strings.length;
             foundrealend = false;
-            for (var i = nolines - 1; i > -1; --i) {
+            for (i = nolines - 1; i > -1; --i) {
                 if (strings[i] === EOL && strings[i - 1] === EOL) {
                     foundrealend = true;
                     nolines = i - 1;
@@ -27,17 +27,16 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
                 return;
             }
 
-            var obj = {};
-            var inSrt = false;
-            var matches;
+            obj = {};
+            inSrt = false;
             for (i = 0; i < nolines; i++) {
-                var line = strings[i];
+                line = strings[i];
                 line = line.length > 2 ? line.substring(0, line.length - 2) : line;
                 console.log('line ' + i + ' @ ' + (line || ''));
                 if ((!inSrt) && lineRegex.test(line)) {
                     inSrt = true;
                     console.log('found an new subtitle');
-                    obj.line = line;
+                    obj.lineno = line;
                     continue;
                 }
                 if (inSrt) {
@@ -69,7 +68,7 @@ define(['marionette', 'underscore', 'models'], function(m, _, models) {
         setTimeout(inner, 0);
         return d.promise();
     };
-    var lib = {
+    lib = {
         fromSrt: srt
     };
     return lib;
