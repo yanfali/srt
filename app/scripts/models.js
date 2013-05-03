@@ -72,9 +72,13 @@ define(['marionette', 'underscore'], function(marionette, _) {
     var Subtitles = Backbone.Collection.extend({
         model: Subtitle
     });
+    var subProto = Subtitle.prototype, subFun = subProto.millisToString;
     var lib = {
         'Subtitle': Subtitle,
-        'Subtitles': Subtitles
+        'Subtitles': Subtitles,
+        'msToTimestamp': function(ms) {
+            return subFun.call(subProto, ms);
+        }
     };
     return lib;
 });
