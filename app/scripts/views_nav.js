@@ -2,6 +2,7 @@
 define(['marionette'], function() {
     'use strict';
     var navBarView = Backbone.Marionette.View.extend({
+        el: '.nav',
         initialize: function() {
             console.log('init NavBarView');
         },
@@ -15,12 +16,7 @@ define(['marionette'], function() {
         }
     });
     var navRegion = Backbone.Marionette.Region.extend({
-        el: '#navigation',
-        open: function(view) {
-            var $nav = this.$el.find('.nav');
-            console.log('open: adding view');
-            view.setElement($nav[0]);
-        }
+        el: '.navigation',
     });
     var lib = {
         NavRegion: navRegion,

@@ -2,14 +2,10 @@
 define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(marionette, models, parse, subtitle) {
     'use strict';
     var mainRegion = Backbone.Marionette.Region.extend({
-        el: '#workarea',
-        open: function(view) {
-            var $nav = this.$el.find('.subtitles');
-            console.log('open: adding subtitle view');
-            view.setElement($nav[0]);
-        }
+        el: '.workarea',
     });
     var mainView = Backbone.Marionette.CollectionView.extend({
+        el: '.subtitles',
         itemView: subtitle.SubtitleView,
         ullist: '<ul><%= args.listitems %></ul>',
         listitem: '<li><%= args.name %> - <%= args.type %> - <%= args.size %></li>',

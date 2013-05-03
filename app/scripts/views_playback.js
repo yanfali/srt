@@ -2,16 +2,14 @@
 define(['marionette', 'models', 'views_subtitle'], function() {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
-        el: '#playback',
-        open: function(view) {
-            var $nav = this.$el.find('.player');
-            console.log('open: adding playerback view');
-            view.setElement($nav[0]);
-        }
+        el: '.playback'
     });
-    var playbackView = Backbone.Marionette.View.extend({
+    var playerControlView = Backbone.Marionette.View.extend({
+        tag: 'span',
+        className: 'btn-toolbar',
+        el: '.controls',
         events: {
-            'click .controls': 'handleClick'
+            'click': 'handleClick'
         },
         ui: {
             timer: '.timer',
@@ -44,7 +42,7 @@ define(['marionette', 'models', 'views_subtitle'], function() {
     });
     var lib = {
         PlaybackRegion: playbackRegion,
-        PlayerView: playbackView
+        PlayerControlView: playerControlView
     };
     return lib;
 });
