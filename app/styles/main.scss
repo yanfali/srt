@@ -42,11 +42,18 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 }
 .timer {
 	vertical-align: middle;
-	margin: 0 1em 0 1em;
+	display: inline-block;
+	margin: 0.7em 1em 0 1em;
+	color: green;
 }
 .play-text {
+	vertical-align: top;
+	display: inline-block;
+	line-height: 1.5;
+	font-size: 1.1em;
 	color: #ffe600;
 }
 .player .controls {
-
+	vertical-align: top;
+	display: inline-block;
 }
