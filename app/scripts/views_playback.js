@@ -124,9 +124,13 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
                     rawEl.innerHTML = subtitle.get('text').join('</br>');
                     start = subtitle.get('start');
                     end = subtitle.get('end');
-                    setTimeout(function() {
-                        rawEl.innerHTML = '';
-                    }, end - start);
+                    subtitle.set('selected', true);
+                    (function(prevModel) {
+                        setTimeout(function() {
+                            rawEl.innerHTML = '';
+                            prevModel.set('selected', false);
+                        }, end - start);
+                    })(subtitle);
                     subtitle = self.collection.at(index++);
                     newstart = subtitle.get('start');
                     elapsed = Date.now() - self.stopwatch;
