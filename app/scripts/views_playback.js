@@ -68,7 +68,7 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
                 var rawEl = self.$el[0];
                 self.timer = setInterval(function() {
                     var ms = Date.now() - self.stopwatch;
-                    rawEl.innerHTML = msToTimestamp(ms);
+                    rawEl.innerHTML = msToTimestamp(ms - ms % 100);
                 }, 66.67);
             })(this);
         },
@@ -87,6 +87,69 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
             console.log('received back');
         }
     });
+    var PlayerTextView = Backbone.Marionette.View.extend({
+        el: '.play-text',
+        timer: null,
+        collection: null,
+        initialize: function(opts) {
+            if (opts.vent) {
+                this.vent = opts.vent;
+            } else {
+                throw new Error('vent Event aggregator needed');
+            }
+            if (opts.collection) {
+                this.collection = opts.collection;
+            } else {
+                throw new Error('need subtitle collection');
+            }
+            _.bindAll(this, 'start', 'stop', 'forward', 'back');
+            this.vent.on('control:start', this.start);
+            this.vent.on('control:stop', this.stop);
+            this.vent.on('control:forward', this.forward);
+            this.vent.on('control:back', this.back);
+        },
+        start: function() {
+            if (this.timer !== null) {
+                return;
+            }
+            console.log('starting preview');
+            var start, end, newstart, rawEl, index, nextMs, playerFn, subtitle, elapsed;
+            index = 0;
+            subtitle = this.collection.at(index++);
+            nextMs = subtitle.get('start');
+            this.stopwatch = Date.now();
+            playerFn = (function(self) {
+                rawEl = self.$el[0];
+                playerFn = function(subtitle) {
+                    rawEl.innerHTML = subtitle.get('text').join('</br>');
+                    start = subtitle.get('start');
+                    end = subtitle.get('end');
+                    setTimeout(function() {
+                        rawEl.innerHTML = '';
+                    }, end - start);
+                    subtitle = self.collection.at(index++);
+                    newstart = subtitle.get('start');
+                    elapsed = Date.now() - self.stopwatch;
+                    self.timer = setTimeout(function() {
+                        playerFn(subtitle);
+                    }, newstart - elapsed);
+                };
+                return playerFn;
+            })(this);
+            this.timer = setTimeout(function() {
+                playerFn(subtitle);
+            }, nextMs);
+        },
+        stop: function() {
+            if (this.timer === null) {
+                return;
+            }
+            clearTimeout(this.timer);
+            this.timer = null;
+        },
+        forward: function() {},
+        back: function() {},
+    });
     var PlayerLayout = Backbone.Marionette.Layout.extend({
         template: '#player-template',
         regions: {
@@ -99,7 +162,8 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
         PlaybackRegion: playbackRegion,
         PlayerControlView: playerControlView,
         PlayerLayout: PlayerLayout,
-        PlayerTimerView: PlayerTimerView
+        PlayerTimerView: PlayerTimerView,
+        PlayerTextView: PlayerTextView
     };
     return lib;
 });

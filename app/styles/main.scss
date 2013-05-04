@@ -36,21 +36,21 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 	margin: 0.25em 0 2px 0;
 }
 .playback.well {
-	background-color: #000;
-	font-size: 1.5em;
-	height: 6em;
+	background-color: #111;
+	height: 7em;
 }
 .timer {
 	vertical-align: middle;
+	font-size: 1.5em;
 	display: inline-block;
 	margin: 0.7em 1em 0 1em;
-	color: green;
+	color: #0B0;
 }
 .play-text {
 	vertical-align: top;
 	display: inline-block;
+	font-size: 1.4em;
 	line-height: 1.5;
-	font-size: 1.1em;
 	color: #ffe600;
 }
 .player .controls {

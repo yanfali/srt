@@ -13,7 +13,8 @@ define(['views_nav', 'views_main', 'views_subtitle', 'views_playback'], function
             SubtitleView: subtitle.SubtitleView,
             PlayerControlView: player.PlayerControlView,
             PlayerLayout: player.PlayerLayout,
-            PlayerTimerView: player.PlayerTimerView
+            PlayerTimerView: player.PlayerTimerView,
+            PlayerTextView: player.PlayerTextView
         }
     };
     return lib;

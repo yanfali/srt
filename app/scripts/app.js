@@ -27,6 +27,10 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     playerLayout.timer.attachView(new uilib.views.PlayerTimerView({
         vent: playerVent
     }));
+    playerLayout.playtext.attachView(new uilib.views.PlayerTextView({
+        vent: playerVent,
+        collection: subtitles
+    }));
 
     return SrtApp;
 });
