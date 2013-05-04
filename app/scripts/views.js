@@ -11,7 +11,9 @@ define(['views_nav', 'views_main', 'views_subtitle', 'views_playback'], function
             NavBarView: nav.NavBarView,
             WorkAreaView: main.WorkAreaView,
             SubtitleView: subtitle.SubtitleView,
-            PlayerControlView: player.PlayerControlView
+            PlayerControlView: player.PlayerControlView,
+            PlayerLayout: player.PlayerLayout,
+            PlayerTimerView: player.PlayerTimerView
         }
     };
     return lib;

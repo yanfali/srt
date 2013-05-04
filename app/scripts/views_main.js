@@ -27,7 +27,7 @@ define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(ma
 
             files = e.originalEvent.dataTransfer.files;
             output = [];
-            for (var i = 0, f = files[i]; f ; f = files[++i]) {
+            for (var i = 0, f = files[i]; f; f = files[++i]) {
                 output.push(_.template(this.listitem, {
                     'name': escape(f.name),
                     'type': f.type || 'n/a',
@@ -44,7 +44,7 @@ define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(ma
 
             reader = new FileReader();
             var subtitles = this.collection;
-            reader.onload = (function(){
+            reader.onload = (function() {
                 return function(e) {
                     var lines;
                     console.log('loaded');

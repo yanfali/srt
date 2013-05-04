@@ -15,17 +15,18 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     SrtApp.workarea.attachView(new uilib.views.WorkAreaView({
         collection: subtitles
     }));
-    var PlayerLayout = Backbone.Marionette.Layout.extend({
-        template: '#player-template',
-        regions: {
-            timer: '.timer',
-            controls: '.controls',
-            playtext: '.play-text'
-        }
-    });
-    var playerLayout = new PlayerLayout();
+
+    var playerVent = new Backbone.Wreqr.EventAggregator();
+    var playerLayout = new uilib.views.PlayerLayout();
     SrtApp.playback.show(playerLayout);
-    playerLayout.controls.attachView(new uilib.views.PlayerControlView({collection: subtitles}));
+
+    playerLayout.controls.attachView(new uilib.views.PlayerControlView({
+        vent: playerVent,
+        collection: subtitles
+    }));
+    playerLayout.timer.attachView(new uilib.views.PlayerTimerView({
+        vent: playerVent
+    }));
 
     return SrtApp;
 });

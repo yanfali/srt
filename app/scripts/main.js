@@ -22,10 +22,10 @@ require.config({
             deps: ['backbone']
         },
         'backbone.babysitter': {
-            deps: ['backbone', 'marionette']
+            deps: ['backbone']
         },
         marionette: {
-            deps: ['backbone'],
+            deps: ['backbone', 'backbone.augment', 'backbone.wreqr', 'backbone.babysitter'],
         },
         bootstrap: {
             deps: ['jquery'],
