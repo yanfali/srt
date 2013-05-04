@@ -63,12 +63,13 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
             if (this.timer !== null) {
                 return;
             }
-            this.stopwatch = new Date().getTime();
+            this.stopwatch = Date.now();
             (function(self) {
+                var rawEl = self.$el[0];
                 self.timer = setInterval(function() {
-                    var ms = new Date().getTime() - self.stopwatch;
-                    self.$el.text(msToTimestamp(ms));
-                }, 100);
+                    var ms = Date.now() - self.stopwatch;
+                    rawEl.innerHTML = msToTimestamp(ms);
+                }, 66.67);
             })(this);
         },
         stop: function() {
