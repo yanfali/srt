@@ -115,6 +115,11 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
             console.log('starting preview');
             var start, end, newstart, rawEl, index, nextMs, playerFn, subtitle, elapsed;
             index = 0;
+            if (this.collection.length === 0) {
+                this.vent.trigger('player:no:subtitles:loaded');
+                this.vent.trigger('control:stop');
+                return;
+            }
             subtitle = this.collection.at(index++);
             nextMs = subtitle.get('start');
             this.stopwatch = Date.now();
@@ -131,6 +136,10 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
                             prevModel.set('selected', false);
                         }, end - start);
                     })(subtitle);
+                    if (self.collection.length === index+1) {
+                        this.vent.trigger('control:stop');
+                        return;
+                    }
                     subtitle = self.collection.at(index++);
                     newstart = subtitle.get('start');
                     elapsed = Date.now() - self.stopwatch;

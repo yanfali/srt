@@ -32,6 +32,10 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
         collection: subtitles
     }));
 
+    playerVent.on('player:no:subtitles:loaded', function() {
+        console.log('player stopping no subs loaded.');
+    });
+
     return SrtApp;
 });
 
