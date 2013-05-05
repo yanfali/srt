@@ -15,6 +15,9 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     SrtApp.workarea.attachView(new uilib.views.WorkAreaView({
         collection: subtitles
     }));
+    SrtApp.vent.on('warning:load:subtitles', function() {
+        SrtApp.workarea.currentView.trigger('flash:dragtome');
+    });
 
     var playerVent = new Backbone.Wreqr.EventAggregator();
     var playerLayout = new uilib.views.PlayerLayout();
@@ -33,6 +36,7 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     }));
 
     playerVent.on('player:no:subtitles:loaded', function() {
+        SrtApp.vent.trigger('warning:load:subtitles');
         console.log('player stopping no subs loaded.');
     });
 

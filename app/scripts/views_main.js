@@ -6,6 +6,22 @@ define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(ma
     });
     var mainView = Backbone.Marionette.CollectionView.extend({
         el: '.subtitles',
+        initialize: function() {
+            _.bindAll(this, 'flashDragToMe');
+            this.on('flash:dragtome', this.flashDragToMe);
+        },
+        flashDragToMe: function() {
+            var el = this.$('h1');
+            el.animate({
+                opacity: 0.1
+            }, 250).animate({
+                opacity: 1.0
+            }, 250).animate({
+                opacity: 0.1
+            }, 250).animate({
+                opacity: 1.0
+            }, 250);
+        },
         itemView: subtitle.SubtitleView,
         ullist: '<ul><%= args.listitems %></ul>',
         listitem: '<li><%= args.name %> - <%= args.type %> - <%= args.size %></li>',
