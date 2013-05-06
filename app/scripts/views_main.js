@@ -60,16 +60,17 @@ define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(ma
 
             reader = new FileReader();
             var subtitles = this.collection;
-            reader.onload = (function() {
+            reader.onload = (function(self, file) {
                 return function(e) {
                     var lines;
-                    console.log('loaded');
+                    console.log('loaded ' + file.name);
                     lines = e.target.result.split('\r\n');
                     subtitles.reset();
                     parse.fromSrt(lines, subtitles);
                     console.log('read ' + lines.length);
+                    self.trigger('loaded');
                 };
-            })(files[0]);
+            })(this, files[0]);
             reader.readAsText(files[0]);
         }
     });
