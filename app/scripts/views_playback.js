@@ -27,17 +27,16 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
         handleClick: function(e) {
             e.stopPropagation();
             e.preventDefault();
-            var $target = $(e.target);
-            if ($target.is('a.btn\\ play') || $target.is('i.icon-play')) {
+            var $target = $(e.target).closest('a');
+            if ($target.is('.play')) {
                 this.vent.trigger('control:start');
-            }
-            if ($target.is('a.btn\\ stop') || $target.is('i.icon-stop')) {
+            } else if ($target.is('.pause')) {
+                this.vent.trigger('control:pause');
+            } else if ($target.is('.stop')) {
                 this.vent.trigger('control:stop');
-            }
-            if ($target.is('a.btn\\ step-backward') || $target.is('i.icon-step-backward')) {
+            } else if ($target.is('.step-backward')) {
                 this.vent.trigger('control:back');
-            }
-            if ($target.is('a.btn\\ step-forward') || $target.is('i.icon-step-forward')) {
+            } else if ($target.is('.step-forward')) {
                 this.vent.trigger('control:forward');
             }
         }
@@ -102,12 +101,14 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
             } else {
                 throw new Error('need subtitle collection');
             }
-            _.bindAll(this, 'start', 'stop', 'forward', 'back');
+            _.bindAll(this, 'start', 'stop', 'forward', 'back', 'pause');
             this.vent.on('control:start', this.start);
             this.vent.on('control:stop', this.stop);
+            this.vent.on('control:pause', this.pause);
             this.vent.on('control:forward', this.forward);
             this.vent.on('control:back', this.back);
         },
+        pause: function() {},
         start: function() {
             if (this.timer !== null) {
                 return;
@@ -136,7 +137,7 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
                             prevModel.set('selected', false);
                         }, end - start);
                     })(subtitle);
-                    if (self.collection.length === index+1) {
+                    if (self.collection.length === index + 1) {
                         this.vent.trigger('control:stop');
                         return;
                     }
