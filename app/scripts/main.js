@@ -8,7 +8,8 @@ require.config({
         marionette: '../components/backbone.marionette/lib/backbone.marionette',
         'backbone.augment': '../components/backbone.marionette/public/javascripts/backbone.augment',
         'backbone.wreqr': '../components/backbone.marionette/public/javascripts/backbone.wreqr',
-        'backbone.babysitter': '../components/backbone.marionette/public/javascripts/backbone.babysitter'
+        'backbone.babysitter': '../components/backbone.marionette/public/javascripts/backbone.babysitter',
+        'js-state-machine': '../components/javascript-state-machine/state-machine'
     },
     shim: {
         backbone: {

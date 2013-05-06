@@ -39,6 +39,10 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
         SrtApp.vent.trigger('warning:load:subtitles');
         console.log('player stopping no subs loaded.');
     });
+    SrtApp.workarea.currentView.on('loaded', function() {
+        console.log('sending trigger for loaded!');
+        playerVent.trigger('file:loaded');
+    });
 
     return SrtApp;
 });

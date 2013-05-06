@@ -1,5 +1,5 @@
 /*global define, Backbone, $ */
-define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, models) {
+define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitle'], function(_, m, models, StateMachine) {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
         el: '.playback'
@@ -9,6 +9,11 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
         el: '.controls',
         collection: null,
         vent: null,
+        fsm: null,
+        events: {
+            'click': 'handleClick'
+        },
+        ui: {},
         initialize: function(opts) {
             if (opts.collection) {
                 this.collection = opts.collection;
@@ -20,20 +25,71 @@ define(['underscore', 'marionette', 'models', 'views_subtitle'], function(_, m, 
             } else {
                 throw new Error('Need an vent aggregator!');
             }
-        },
-        events: {
-            'click': 'handleClick'
+            (function(self) {
+                self.fsm = StateMachine.create({
+                    error: function(eventName, from, to, args, errorCode, errorMessage) {
+                        console.log('event' + eventName + ' was unexpected :- ' + errorMessage);
+                    },
+                    initial: 'unloaded',
+                    events: [{
+                        name: 'load',
+                        from: 'unloaded',
+                        to: 'stopped'
+                    }, {
+                        name: 'start',
+                        from: 'stopped',
+                        to: 'playing'
+                    }, {
+                        name: 'stop',
+                        from: 'playing',
+                        to: 'stopped'
+                    }, {
+                        name: 'pause',
+                        from: 'playing',
+                        to: 'paused'
+                    }, {
+                        name: 'start',
+                        from: 'paused',
+                        to: 'playing'
+                    }, {
+                        name: 'start',
+                        from: 'unloaded',
+                        to: 'unloaded'
+                    }],
+                    callbacks: {
+                        onstart: function(event, from /*, to*/ ) {
+                            self.vent.trigger('control:start');
+                            if (from === 'unloaded') {
+                                return false;
+                            }
+                            self.ui.play.find('i').removeClass().addClass('icon-pause');
+                        },
+                        onstop: function( /*event, from, to*/ ) {
+                            self.vent.trigger('control:stop');
+                            self.ui.play.find('i').removeClass().addClass('icon-play');
+                        },
+                        onpause: function( /*event, from, to*/ ) {
+                            self.vent.trigger('control:pause');
+                            self.ui.play.find('i').removeClass().addClass('icon-play');
+                        }
+                    }
+                });
+                self.vent.on('file:loaded', function() {
+                    self.fsm.load();
+                });
+            })(this);
+            this.ui.play = this.$('.btn.play');
         },
         handleClick: function(e) {
             e.stopPropagation();
             e.preventDefault();
             var $target = $(e.target).closest('a');
             if ($target.is('.play')) {
-                this.vent.trigger('control:start');
+                this.fsm.start();
             } else if ($target.is('.pause')) {
-                this.vent.trigger('control:pause');
+                this.fsm.pause();
             } else if ($target.is('.stop')) {
-                this.vent.trigger('control:stop');
+                this.fsm.stop();
             } else if ($target.is('.step-backward')) {
                 this.vent.trigger('control:back');
             } else if ($target.is('.step-forward')) {
