@@ -178,9 +178,9 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
             console.log('received back');
         },
         pause: function() {
-            console.log('pausing timer');
             clearInterval(this.timer);
             this.elapsed = Date.now() - this.stopwatch;
+            console.log('pausing timer ' + this.elapsed);
             this.timer = null;
         },
         resume: function() {
@@ -210,32 +210,40 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
             } else {
                 throw new Error('need subtitle collection');
             }
-            _.bindAll(this, 'start', 'stop', 'forward', 'back', 'pause');
+            _.bindAll(this, 'start', 'stop', 'forward', 'back', 'pause', 'resume');
             this.vent.on('control:start', this.start);
             this.vent.on('control:stop', this.stop);
             this.vent.on('control:pause', this.pause);
+            this.vent.on('control:resume', this.resume);
             this.vent.on('control:forward', this.forward);
             this.vent.on('control:back', this.back);
         },
-        pause: function() {},
-        start: function() {
-            if (this.timer !== null) {
-                return;
-            }
-            console.log('starting preview');
-            var start, end, newstart, rawEl, index, nextMs, playerFn, subtitle, elapsed;
-            index = 0;
-            if (this.collection.length === 0) {
-                this.vent.trigger('player:no:subtitles:loaded');
-                this.vent.trigger('control:stop');
-                return;
-            }
-            subtitle = this.collection.at(index++);
-            nextMs = subtitle.get('start');
-            this.stopwatch = Date.now();
-            playerFn = (function(self) {
-                rawEl = self.$el[0];
-                playerFn = function(subtitle) {
+        pause: function() {
+            clearTimeout(this.timer);
+            this.elapsed = Date.now() - this.stopwatch;
+            console.log('pausing text @ ' + this.elapsed);
+            this.timer = null;
+        },
+        resume: function() {
+            this.stopwatch = Date.now() - this.elapsed;
+            console.log('resuming text from ' + this.elapsed);
+            var playerFn = this.makePlayerFn();
+            var subtitle = this.collection.at(this.index);
+            var nextMs = subtitle.get('start') - this.elapsed;
+            console.log('showing subtitle in ' + nextMs);
+            var self = this;
+            this.timer = setTimeout(function() {
+                playerFn(self.index);
+            }, nextMs);
+        },
+        makePlayerFn: function() {
+            var self = this;
+            var playerFn = (function() {
+                var rawEl = self.$el[0];
+                var start, end, newstart, elapsed;
+                return function(index) {
+                    self.index = index;
+                    var subtitle = self.collection.at(index);
                     rawEl.innerHTML = subtitle.get('text').join('</br>');
                     start = subtitle.get('start');
                     end = subtitle.get('end');
@@ -250,17 +258,33 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
                         this.vent.trigger('control:stop');
                         return;
                     }
-                    subtitle = self.collection.at(index++);
+                    self.index = index + 1;
+                    subtitle = self.collection.at(self.index);
                     newstart = subtitle.get('start');
                     elapsed = Date.now() - self.stopwatch;
                     self.timer = setTimeout(function() {
-                        playerFn(subtitle);
+                        playerFn(self.index);
                     }, newstart - elapsed);
                 };
-                return playerFn;
-            })(this);
+            })();
+            return playerFn;
+        },
+        start: function() {
+            if (this.timer !== null) {
+                return;
+            }
+            console.log('starting preview');
+            if (this.collection.length === 0) {
+                this.vent.trigger('player:no:subtitles:loaded');
+                this.vent.trigger('control:stop');
+                return;
+            }
+            this.stopwatch = Date.now();
+            var playerFn = this.makePlayerFn();
+            var subtitle = this.collection.at(0);
+            var nextMs = subtitle.get('start');
             this.timer = setTimeout(function() {
-                playerFn(subtitle);
+                playerFn(0);
             }, nextMs);
         },
         stop: function() {
