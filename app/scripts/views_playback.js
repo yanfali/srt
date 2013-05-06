@@ -125,7 +125,7 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
                         }, end - start);
                     })(subtitle);
                     if (self.collection.length === index + 1) {
-                        this.vent.trigger('control:stop');
+                        self.vent.trigger('control:stop');
                         return;
                     }
                     self.index = index + 1;
