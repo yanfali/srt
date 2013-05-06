@@ -101,7 +101,10 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
         onstart: function(event, from /*, to*/ ) {
             var $play = this.ui.play,
                 $icon = $play.find('i');
-            this.vent.trigger('control:start');
+            var vent = this.vent;
+            _.defer(function() {
+                vent.trigger('control:start');
+            });
             if (from === 'unloaded') {
                 return false;
             }
@@ -110,8 +113,8 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
         },
         onstop: function( /*event, from, to*/ ) {
             var $play = this.ui.play,
-                $icon = $play.find('i');
-            this.vent.trigger('control:stop');
+                $icon = $play.find('i'),
+                vent = this.vent;
             $play.removeClass('pause').addClass('play');
             $icon.removeClass().addClass('icon-play');
             if (this.pauseIconTimer !== null) {
@@ -119,11 +122,14 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
                 clearInterval(this.pauseIconTimer);
                 $icon.css('visibility', 'visible');
             }
+            _.defer(function() {
+                vent.trigger('control:stop');
+            });
         },
         onpause: function( /*event, from, to*/ ) {
             var $play = this.ui.play,
-                $icon = $play.find('i');
-            this.vent.trigger('control:pause');
+                $icon = $play.find('i'),
+                vent = this.vent;
             $play.removeClass('pause').addClass('resume');
             $icon.removeClass().addClass('icon-play');
             this.pauseIconTimer = setInterval(function() {
@@ -133,20 +139,32 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
                     $icon.css('visibility', 'visible');
                 }
             }, 1000);
+            _.defer(function() {
+                vent.trigger('control:pause');
+            });
         },
         onresume: function( /*event, from, to*/ ) {
             var $play = this.ui.play,
-                $icon = $play.find('i');
-            this.vent.trigger('control:resume');
+                $icon = $play.find('i'),
+                vent = this.vent;
             $play.removeClass('resume').addClass('pause');
             clearInterval(this.pauseIconTimer);
             $icon.css('visibility', 'visible').removeClass().addClass('icon-pause');
+            _.defer(function() {
+                vent.trigger('control:resume');
+            });
         },
         onforward: function() {
-            this.vent.trigger('control:forward');
+            var vent = this.vent;
+            _.defer(function() {
+                vent.trigger('control:forward');
+            });
         },
         onbackward: function() {
-            this.vent.trigger('control:backward');
+            var vent = this.vent;
+            _.defer(function() {
+                vent.trigger('control:backward');
+            });
         }
     });
     var lib = {
