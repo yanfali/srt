@@ -1,4 +1,4 @@
-/*global define, Backbone, $ */
+/*global define, Backbone, $, clearInterval */
 define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitle'], function(_, m, models, StateMachine) {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
@@ -28,7 +28,7 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
             (function(self) {
                 self.fsm = StateMachine.create({
                     error: function(eventName, from, to, args, errorCode, errorMessage) {
-                        console.log('event' + eventName + ' was unexpected :- ' + errorMessage);
+                        console.log('event ' + eventName + ' was unexpected :- ' + errorMessage);
                     },
                     initial: 'unloaded',
                     events: [{
@@ -44,9 +44,17 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
                         from: 'playing',
                         to: 'stopped'
                     }, {
+                        name: 'stop',
+                        from: 'paused',
+                        to: 'stopped'
+                    }, {
                         name: 'pause',
                         from: 'playing',
                         to: 'paused'
+                    }, {
+                        name: 'resume',
+                        from: 'paused',
+                        to: 'playing'
                     }, {
                         name: 'start',
                         from: 'paused',
@@ -62,15 +70,39 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
                             if (from === 'unloaded') {
                                 return false;
                             }
+                            self.ui.play.removeClass('play').addClass('pause');
                             self.ui.play.find('i').removeClass().addClass('icon-pause');
                         },
                         onstop: function( /*event, from, to*/ ) {
                             self.vent.trigger('control:stop');
+                            self.ui.play.removeClass('pause').addClass('play');
                             self.ui.play.find('i').removeClass().addClass('icon-play');
+                            console.log(self.pauseIconTimer);
+                            if (self.pauseIconTimer !== null) {
+                                clearInterval(self.pauseIconTimer);
+                                self.ui.play.find('i').css('visibility', 'visible');
+                            }
                         },
                         onpause: function( /*event, from, to*/ ) {
                             self.vent.trigger('control:pause');
-                            self.ui.play.find('i').removeClass().addClass('icon-play');
+                            var icon = self.ui.play.find('i');
+                            self.ui.play.removeClass('pause').addClass('resume');
+                            icon.removeClass().addClass('icon-play');
+                            self.pauseIconTimer = setInterval(function() {
+                                if (icon.css('visibility') === 'visible') {
+                                    icon.css('visibility', 'hidden');
+                                } else {
+                                    icon.css('visibility', 'visible');
+                                }
+                            }, 1000);
+                        },
+                        onresume: function( /*event, from, to*/ ) {
+                            self.vent.trigger('control:resume');
+                            self.ui.play.removeClass('resume').addClass('pause');
+                            clearInterval(self.pauseIconTimer);
+                            var icon = self.ui.play.find('i');
+                            icon.css('visibility', 'visible');
+                            icon.removeClass().addClass('icon-pause');
                         }
                     }
                 });
@@ -88,6 +120,8 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
                 this.fsm.start();
             } else if ($target.is('.pause')) {
                 this.fsm.pause();
+            } else if ($target.is('.resume')) {
+                this.fsm.resume();
             } else if ($target.is('.stop')) {
                 this.fsm.stop();
             } else if ($target.is('.step-backward')) {
@@ -106,8 +140,10 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
             } else {
                 throw new Error('vent Event aggregator needed');
             }
-            _.bindAll(this, 'start', 'stop', 'forward', 'back');
+            _.bindAll(this, 'start', 'stop', 'forward', 'back', 'pause', 'resume');
             this.vent.on('control:start', this.start);
+            this.vent.on('control:pause', this.pause);
+            this.vent.on('control:resume', this.resume);
             this.vent.on('control:stop', this.stop);
             this.vent.on('control:forward', this.forward);
             this.vent.on('control:back', this.back);
@@ -140,6 +176,23 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
         },
         back: function() {
             console.log('received back');
+        },
+        pause: function() {
+            console.log('pausing timer');
+            clearInterval(this.timer);
+            this.elapsed = Date.now() - this.stopwatch;
+            this.timer = null;
+        },
+        resume: function() {
+            this.stopwatch = Date.now() - this.elapsed;
+            console.log('resuming timer from ' + this.elapsed);
+            (function(self) {
+                var rawEl = self.$el[0];
+                self.timer = setInterval(function() {
+                    var ms = Date.now() - self.stopwatch;
+                    rawEl.innerHTML = msToTimestamp(ms - ms % 100);
+                }, 66.67);
+            })(this);
         }
     });
     var PlayerTextView = Backbone.Marionette.View.extend({
