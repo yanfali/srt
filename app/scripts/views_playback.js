@@ -1,5 +1,5 @@
 /*global define, Backbone, clearInterval */
-define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitle', 'views_playback_controls'], function(_, m, models, StateMachine, controls) {
+define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playback_controls', 'views_subtitle'], function(_, m, models, StateMachine, control) {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
         el: '.playback'
@@ -177,7 +177,7 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_subtitl
     });
     var lib = {
         PlaybackRegion: playbackRegion,
-        PlayerControlView: controls.playerControlView,
+        PlayerControlView: control.PlayerControlView,
         PlayerLayout: PlayerLayout,
         PlayerTimerView: PlayerTimerView,
         PlayerTextView: PlayerTextView

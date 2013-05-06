@@ -1,5 +1,5 @@
 /*global define, Backbone, $, clearInterval */
-define(['marionette', 'js-state-machine', 'views_subtitle'], function(m, StateMachine) {
+define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], function(_, m, StateMachine) {
     'use strict';
     var playerControlView = Backbone.Marionette.View.extend({
         el: '.controls',
@@ -10,6 +10,43 @@ define(['marionette', 'js-state-machine', 'views_subtitle'], function(m, StateMa
             'click': 'handleClick'
         },
         ui: {},
+        fsmEvents: [{
+            name: 'load',
+            from: 'unloaded',
+            to: 'stopped'
+        }, {
+            name: 'start',
+            from: 'stopped',
+            to: 'playing'
+        }, {
+            name: 'stop',
+            from: 'playing',
+            to: 'stopped'
+        }, {
+            name: 'stop',
+            from: 'paused',
+            to: 'stopped'
+        }, {
+            name: 'pause',
+            from: 'playing',
+            to: 'paused'
+        }, {
+            name: 'resume',
+            from: 'paused',
+            to: 'playing'
+        }, {
+            name: 'start',
+            from: 'paused',
+            to: 'playing'
+        }, {
+            name: 'start',
+            from: 'unloaded',
+            to: 'unloaded'
+        }, {
+            name: 'forward',
+            from: 'playing',
+            to: 'playing'
+        }],
         initialize: function(opts) {
             if (opts.collection) {
                 this.collection = opts.collection;
@@ -21,97 +58,20 @@ define(['marionette', 'js-state-machine', 'views_subtitle'], function(m, StateMa
             } else {
                 throw new Error('Need an vent aggregator!');
             }
+            _.bindAll(this, 'onstart', 'onstop', 'onpause', 'onresume', 'onforward', 'onbackward');
             (function(self) {
                 self.fsm = StateMachine.create({
                     error: function(eventName, from, to, args, errorCode, errorMessage) {
                         console.log('event ' + eventName + ' was unexpected :- ' + errorMessage);
                     },
                     initial: 'unloaded',
-                    events: [{
-                        name: 'load',
-                        from: 'unloaded',
-                        to: 'stopped'
-                    }, {
-                        name: 'start',
-                        from: 'stopped',
-                        to: 'playing'
-                    }, {
-                        name: 'stop',
-                        from: 'playing',
-                        to: 'stopped'
-                    }, {
-                        name: 'stop',
-                        from: 'paused',
-                        to: 'stopped'
-                    }, {
-                        name: 'pause',
-                        from: 'playing',
-                        to: 'paused'
-                    }, {
-                        name: 'resume',
-                        from: 'paused',
-                        to: 'playing'
-                    }, {
-                        name: 'start',
-                        from: 'paused',
-                        to: 'playing'
-                    }, {
-                        name: 'start',
-                        from: 'unloaded',
-                        to: 'unloaded'
-                    }, {
-                        name: 'forward',
-                        from: 'playing',
-                        to: 'playing'
-                    }],
+                    events: self.fsmEvents,
                     callbacks: {
-                        onstart: function(event, from /*, to*/ ) {
-                            var $play = self.ui.play,
-                                $icon = $play.find('i');
-                            self.vent.trigger('control:start');
-                            if (from === 'unloaded') {
-                                return false;
-                            }
-                            $play.removeClass('play').addClass('pause');
-                            $icon.removeClass().addClass('icon-pause');
-                        },
-                        onstop: function( /*event, from, to*/ ) {
-                            var $play = self.ui.play,
-                                $icon = $play.find('i');
-                            self.vent.trigger('control:stop');
-                            $play.removeClass('pause').addClass('play');
-                            $icon.removeClass().addClass('icon-play');
-                            if (self.pauseIconTimer !== null) {
-                                console.log(self.pauseIconTimer);
-                                clearInterval(self.pauseIconTimer);
-                                $icon.css('visibility', 'visible');
-                            }
-                        },
-                        onpause: function( /*event, from, to*/ ) {
-                            var $play = self.ui.play,
-                                $icon = $play.find('i');
-                            self.vent.trigger('control:pause');
-                            $play.removeClass('pause').addClass('resume');
-                            $icon.removeClass().addClass('icon-play');
-                            self.pauseIconTimer = setInterval(function() {
-                                if ($icon.css('visibility') === 'visible') {
-                                    $icon.css('visibility', 'hidden');
-                                } else {
-                                    $icon.css('visibility', 'visible');
-                                }
-                            }, 1000);
-                        },
-                        onresume: function( /*event, from, to*/ ) {
-                            var $play = self.ui.play,
-                                $icon = $play.find('i');
-                            self.vent.trigger('control:resume');
-                            $play.removeClass('resume').addClass('pause');
-                            clearInterval(self.pauseIconTimer);
-                            $icon.css('visibility', 'visible').removeClass().addClass('icon-pause');
-                        },
-                        onforward: function() {
-                            self.vent.trigger('control:forward');
-                        }
+                        onstart: self.onstart,
+                        onstop: self.onstop,
+                        onpause: self.onpause,
+                        onresume: self.onresume,
+                        onforward: self.onforward
                     }
                 });
                 self.vent.on('file:loaded', function() {
@@ -137,6 +97,56 @@ define(['marionette', 'js-state-machine', 'views_subtitle'], function(m, StateMa
             } else if ($target.is('.step-forward')) {
                 this.fsm.forward();
             }
+        },
+        onstart: function(event, from /*, to*/ ) {
+            var $play = this.ui.play,
+                $icon = $play.find('i');
+            this.vent.trigger('control:start');
+            if (from === 'unloaded') {
+                return false;
+            }
+            $play.removeClass('play').addClass('pause');
+            $icon.removeClass().addClass('icon-pause');
+        },
+        onstop: function( /*event, from, to*/ ) {
+            var $play = this.ui.play,
+                $icon = $play.find('i');
+            this.vent.trigger('control:stop');
+            $play.removeClass('pause').addClass('play');
+            $icon.removeClass().addClass('icon-play');
+            if (this.pauseIconTimer !== null) {
+                console.log(this.pauseIconTimer);
+                clearInterval(this.pauseIconTimer);
+                $icon.css('visibility', 'visible');
+            }
+        },
+        onpause: function( /*event, from, to*/ ) {
+            var $play = this.ui.play,
+                $icon = $play.find('i');
+            this.vent.trigger('control:pause');
+            $play.removeClass('pause').addClass('resume');
+            $icon.removeClass().addClass('icon-play');
+            this.pauseIconTimer = setInterval(function() {
+                if ($icon.css('visibility') === 'visible') {
+                    $icon.css('visibility', 'hidden');
+                } else {
+                    $icon.css('visibility', 'visible');
+                }
+            }, 1000);
+        },
+        onresume: function( /*event, from, to*/ ) {
+            var $play = this.ui.play,
+                $icon = $play.find('i');
+            this.vent.trigger('control:resume');
+            $play.removeClass('resume').addClass('pause');
+            clearInterval(this.pauseIconTimer);
+            $icon.css('visibility', 'visible').removeClass().addClass('icon-pause');
+        },
+        onforward: function() {
+            this.vent.trigger('control:forward');
+        },
+        onbackward: function() {
+            this.vent.trigger('control:backward');
         }
     });
     var lib = {
