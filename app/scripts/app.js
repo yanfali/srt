@@ -1,4 +1,4 @@
-/*global define, Backbone */
+/*global define, Backbone, $ */
 define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, models, parse) {
     'use strict';
     var SrtApp = new Backbone.Marionette.Application();
@@ -42,6 +42,14 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
     SrtApp.workarea.currentView.on('loaded', function() {
         console.log('sending trigger for loaded!');
         playerVent.trigger('file:loaded');
+    });
+
+    $('body').on('keyup', function(event) {
+        console.log('you pushed ' + event.keyCode);
+        if (event.keyCode === 32) {
+            playerVent.trigger('control:toggleplay');
+        }
+        return false;
     });
 
     return SrtApp;

@@ -58,7 +58,7 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
             } else {
                 throw new Error('Need an vent aggregator!');
             }
-            _.bindAll(this, 'onstart', 'onstop', 'onpause', 'onresume', 'onforward', 'onbackward');
+            _.bindAll(this, 'onstart', 'onstop', 'onpause', 'onresume', 'onforward', 'onbackward', 'toggle');
             (function(self) {
                 self.fsm = StateMachine.create({
                     error: function(eventName, from, to, args, errorCode, errorMessage) {
@@ -79,6 +79,18 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
                 });
             })(this);
             this.ui.play = this.$('.btn.play');
+            this.vent.on('control:toggleplay', this.toggle);
+        },
+        toggle: function() {
+            var current = this.fsm.current;
+            console.log(current);
+            if (current === 'stopped') {
+                this.fsm.start();
+            } else if (current === 'playing') {
+                this.fsm.pause();
+            } else if (current === 'paused') {
+                this.fsm.resume();
+            }
         },
         handleClick: function(e) {
             e.stopPropagation();
