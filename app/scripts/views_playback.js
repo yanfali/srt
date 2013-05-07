@@ -1,4 +1,4 @@
-/*global define, Backbone, clearInterval */
+/*global define, Backbone */
 define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playback_controls', 'views_subtitle'], function(_, m, models, StateMachine, control) {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
@@ -15,13 +15,14 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
             } else {
                 throw new Error('vent Event aggregator needed');
             }
-            _.bindAll(this, 'start', 'stop', 'forward', 'back', 'pause', 'resume');
+            _.bindAll(this, 'start', 'stop', 'forward', 'backward', 'pause', 'resume', 'stopwatch');
             this.vent.on('control:start', this.start);
             this.vent.on('control:pause', this.pause);
             this.vent.on('control:resume', this.resume);
             this.vent.on('control:stop', this.stop);
             this.vent.on('control:forward', this.forward);
-            this.vent.on('control:back', this.back);
+            this.vent.on('control:backward', this.backward);
+            this.vent.on('update:stopwatch', this.stopwatch);
         },
         timer: null,
         runTimer: function() {
@@ -50,7 +51,11 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
         forward: function() {
             console.log('received forward');
         },
-        back: function() {
+        stopwatch: function(stopwatch) {
+            console.log('received new stopwatch ' + stopwatch);
+            this.stopwatch = stopwatch;
+        },
+        backward: function() {
             console.log('received back');
         },
         pause: function() {
@@ -106,6 +111,27 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
                 playerFn(self.index);
             }, nextMs);
         },
+        forward: function() {
+            clearTimeout(this.timer);
+            this.elapsed = Date.now() - this.stopwatch;
+            var index = this.index;
+            var subtitle = this.collection.at(index);
+            var start = subtitle.get('start');
+            subtitle.set('selected', false);
+            var playerFn = this.makePlayerFn();
+            if (this.elapsed < subtitle.get('start')) {
+                this.elapsed = start;
+            } else {
+                index++;
+                subtitle = this.collection.at(index);
+                this.elapsed = subtitle.get('start');
+            }
+            this.stopwatch = Date.now() - this.elapsed;
+            this.vent.trigger('update:stopwatch', this.stopwatch);
+            this.timer = setTimeout(function() {
+                playerFn(index);
+            }, 0);
+        },
         makePlayerFn: function() {
             var self = this;
             var playerFn = (function() {
@@ -128,7 +154,7 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
                         self.vent.trigger('control:stop');
                         return;
                     }
-                    self.index = index + 1;
+                    self.index += 1;
                     subtitle = self.collection.at(self.index);
                     newstart = subtitle.get('start');
                     elapsed = Date.now() - self.stopwatch;
@@ -164,7 +190,6 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
             clearTimeout(this.timer);
             this.timer = null;
         },
-        forward: function() {},
         back: function() {},
     });
     var PlayerLayout = Backbone.Marionette.Layout.extend({
