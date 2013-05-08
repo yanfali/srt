@@ -12,15 +12,10 @@ define(['backbone.babysitter', 'models', 'parse', 'views_subtitle'], function(ma
         },
         flashDragToMe: function() {
             var el = this.$('h1');
-            el.animate({
-                opacity: 0.1
-            }, 250).animate({
-                opacity: 1.0
-            }, 250).animate({
-                opacity: 0.1
-            }, 250).animate({
-                opacity: 1.0
-            }, 250);
+            el.addClass('swing');
+            _.delay(function() {
+                el.removeClass('swing');
+            },2500);
         },
         itemView: subtitle.SubtitleView,
         ullist: '<ul><%= args.listitems %></ul>',
