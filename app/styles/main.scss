@@ -72,66 +72,52 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 .workarea h1 {
 	max-width: 6em;
 }
-/* originally authored by Nick Pettit - https://github.com/nickpettit/glide */
 /* Copyright (c) 2012 Dan Eden Animate.css - http://daneden.me/animate Licensed under the ☺ license (http://licence.visualidiot.com/) */
-
+@mixin keyframes-swing($prefix: '') {
+	20% { #{$prefix}transform: rotate(15deg); opacity:0;}	
+	40% { #{$prefix}transform: rotate(-10deg); }
+	60% { #{$prefix}transform: rotate(5deg); }	
+	80% { #{$prefix}transform: rotate(-5deg); }	
+	100% { #{$prefix}transform: rotate(0deg); opacity:1;}
+}
 @-webkit-keyframes swing {
 	20%, 40%, 60%, 80%, 100% { -webkit-transform-origin: top center; }
-	20% { -webkit-transform: rotate(15deg); opacity:0;}	
-	40% { -webkit-transform: rotate(-10deg); }
-	60% { -webkit-transform: rotate(5deg); }	
-	80% { -webkit-transform: rotate(-5deg); }	
-	100% { -webkit-transform: rotate(0deg); opacity:1;}
+	@include keyframes-swing(-webkit-)
 }
-
 @-moz-keyframes swing {
-	20% { -moz-transform: rotate(15deg); opacity:0;}	
-	40% { -moz-transform: rotate(-10deg); }
-	60% { -moz-transform: rotate(5deg); }	
-	80% { -moz-transform: rotate(-5deg); }	
-	100% { -moz-transform: rotate(0deg); opacity:1;}
+	@include keyframes-swing(-moz-)
 }
-
 @-o-keyframes swing {
-	20% { -o-transform: rotate(15deg); opacity:0;}	
-	40% { -o-transform: rotate(-10deg); }
-	60% { -o-transform: rotate(5deg); }	
-	80% { -o-transform: rotate(-5deg); }	
-	100% { -o-transform: rotate(0deg); opacity:1;}
+	@include keyframes-swing(-o-)
 }
-
 @keyframes swing {
-	20% { transform: rotate(15deg); opacity:0;}	
-	40% { transform: rotate(-10deg); }
-	60% { transform: rotate(5deg); }	
-	80% { transform: rotate(-5deg); }	
-	100% { transform: rotate(0deg); opacity:1;}
+	@include keyframes-swing()
+}
+@mixin transform-origin($x: '', $y: '', $z: '') {
+	-webkit-transform-origin: #{$x} #{$y} #{$z};
+	-moz-transform-origin: #{$x} #{$y} #{$z};
+	-o-transform-origin: #{$x} #{$y} #{$z};
+	transform-origin: #{$x} #{$y} #{$z};
+}
+@mixin animation-name($name) {
+	-webkit-animation-name: #{$name};
+	-moz-animation-name: #{$name};
+	-o-animation-name: #{$name};
+	animation-name: #{$name};
 }
 .swing {
-	-webkit-transform-origin: top center;
-	-moz-transform-origin: top center;
-	-o-transform-origin: top center;
-	transform-origin: top center;
-	-webkit-animation-name: swing;
-	-moz-animation-name: swing;
-	-o-animation-name: swing;
-	animation-name: swing;
+	@include transform-origin(top, center);
+	@include animation-name(swing);
+}
+@mixin animation-params($prefix, $duration, $delay, $timing, $fillmode) {
+   	#{$prefix}animation-duration: #{$duration};
+	#{$prefix}animation-delay: #{$delay};
+	#{$prefix}animation-timing-function: #{$timing};
+	#{$prefix}animation-fill-mode: #{$fillmode};
 }
 .animate0{
-   	-webkit-animation-duration: .5s;
-	-webkit-animation-delay: 0s;
-	-webkit-animation-timing-function: ease;
-	-webkit-animation-fill-mode: both;
-	-moz-animation-duration: .5s;
-	-moz-animation-delay: 0s;
-	-moz-animation-timing-function: ease;
-	-moz-animation-fill-mode: both;
-	-ms-animation-duration: .5s;
-	-ms-animation-delay: 0s;
-	-ms-animation-timing-function: ease;
-	-ms-animation-fill-mode: both;
-	animation-duration: .5s;
-	animation-delay: 0s;
-	animation-timing-function: ease;
-	animation-fill-mode: both;	          
+	@include animation-params(-webkit-, 0.5s, 0s, ease, both);
+	@include animation-params(-moz-, 0.5s, 0s, ease, both);
+	@include animation-params(-ms-, 0.5s, 0s, ease, both);
+	@include animation-params('', 0.5s, 0s, ease, both);
 }   
