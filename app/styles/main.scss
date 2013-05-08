@@ -26,48 +26,47 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 	overflow: auto;
 	white-space: nowrap;
 }
-.start, .end {
+.start, .end, .icon {
 	vertical-align: top;
 	display: inline-block;
 	margin: 0.25em 1em 2px 0;
 }
 .icon {
-	vertical-align: top;
-	display: inline-block;
-	margin: 0.25em 0 2px 0;
 	width: 1em;
 }
 .text{
 	display: inline-block;
 	margin: 0.25em 0 2px 0;
 }
-.playback.well {
+.playback {
 	background-color: #111;
 	height: 7em;
 }
+$timer-color: #0B0;
 .timer {
 	vertical-align: middle;
 	font-size: 1.5em;
 	display: inline-block;
 	margin: 0.7em 1em 0 1em;
-	color: #0B0;
+	color: $timer-color;
+}
+$subtitle-color: #ffe600;
+.play-text, .player .controls {
+	vertical-align: top;
+	display: inline-block;
 }
 .play-text {
-	vertical-align: top;
-	display: inline-block;
 	font-size: 1.4em;
 	line-height: 1.5;
-	color: #ffe600;
+	color: $subtitle-color;
 }
-.player .controls {
-	vertical-align: top;
-	display: inline-block;
-}
+$srt-text-color: #aaa;
 .text {
-	color: #aaa;
+	color: darken($srt-text-color, 10%);
 }
+$srt-highlighted-text-color: #000;
 .selected {
-	color: #000;
+	color: $srt-highlighted-text-color;
 }
 .workarea h1 {
 	max-width: 6em;
