@@ -9,7 +9,8 @@ require.config({
         'backbone.augment': '../components/backbone.marionette/public/javascripts/backbone.augment',
         'backbone.wreqr': '../components/backbone.marionette/public/javascripts/backbone.wreqr',
         'backbone.babysitter': '../components/backbone.marionette/public/javascripts/backbone.babysitter',
-        'js-state-machine': '../components/javascript-state-machine/state-machine'
+        'js-state-machine': '../components/javascript-state-machine/state-machine',
+        'rafShim': 'vendor/rafShim'
     },
     shim: {
         backbone: {

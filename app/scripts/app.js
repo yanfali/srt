@@ -28,13 +28,9 @@ define(['marionette', 'views', 'models', 'parse'], function(marionette, uilib, m
         collection: subtitles
     }));
     playerLayout.timer.attachView(new uilib.views.PlayerTimerView({
-        vent: playerVent
-    }));
-    playerLayout.playtext.attachView(new uilib.views.PlayerTextView({
         vent: playerVent,
         collection: subtitles
     }));
-
     playerVent.on('player:no:subtitles:loaded', function() {
         SrtApp.vent.trigger('warning:load:subtitles');
         console.log('player stopping no subs loaded.');

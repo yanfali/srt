@@ -1,5 +1,5 @@
-/*global define, Backbone */
-define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playback_controls', 'views_subtitle'], function(_, m, models, StateMachine, control) {
+/*global define, Backbone, $ */
+define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playback_controls', 'views_subtitle', 'rafShim'], function(_, m, models, StateMachine, control) {
     'use strict';
     var playbackRegion = Backbone.Marionette.Region.extend({
         el: '.playback'
@@ -8,14 +8,20 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
     var PlayerTimerView = Backbone.Marionette.View.extend({
         el: '.timer',
         vent: null,
-        interval: 66.67,
+        interval: 1000 / 60,
+        running: false,
+        current: 0,
+        next: 1,
         initialize: function(opts) {
             if (opts.vent) {
                 this.vent = opts.vent;
             } else {
                 throw new Error('vent Event aggregator needed');
             }
-            _.bindAll(this, 'start', 'stop', 'forward', 'backward', 'pause', 'resume', 'stopwatch');
+            if (opts.collection) {
+                this.collection = opts.collection;
+            }
+            _.bindAll(this, 'start', 'stop', 'forward', 'backward', 'pause', 'resume', 'stopwatch', 'animate', 'drawTimer', 'drawSubtitle');
             this.vent.on('control:start', this.start);
             this.vent.on('control:pause', this.pause);
             this.vent.on('control:resume', this.resume);
@@ -26,27 +32,60 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
         },
         timer: null,
         runTimer: function() {
-            var rawEl = this.$el[0], self = this;
+            var rawEl = this.$el[0],
+                self = this;
             this.timer = setInterval(function() {
                 var ms = Date.now() - self.stopwatch;
                 rawEl.innerHTML = msToTimestamp(ms - ms % 100);
             }, this.interval);
         },
+        animate: function() {
+            if (this.running) {
+                window.requestAnimationFrame(this.animate);
+                this.drawTimer();
+                this.drawSubtitle();
+            }
+        },
+        drawTimer: function() {
+            var rawEl = this.$el[0];
+            var ms = Date.now() - this.stopwatch;
+            rawEl.innerHTML = msToTimestamp(ms);
+        },
+        drawSubtitle: function() {
+            var rawEl = $('.play-text')[0];
+            var subtitle = this.collection.at(this.next);
+            var elapsed = Date.now() - this.stopwatch;
+            var start = subtitle.get('start');
+            var end = subtitle.get('end');
+            if (this.current !== this.next && elapsed >= start && elapsed <= end) {
+                this.current = this.next;
+                rawEl.innerHTML = subtitle.get('text').join('</br>');
+                rawEl.style.visibility = 'visible';
+                subtitle.set('selected', true);
+            } else {
+                if (this.current === this.next && elapsed >= start && elapsed >= end) {
+                    rawEl.style.visibility = 'hidden';
+                    subtitle.set('selected', false);
+                    this.next += 1;
+                }
+            }
+        },
         start: function() {
             console.log('received start');
-            if (this.timer !== null) {
+            if (this.collection.length === 0) {
+                this.vent.trigger('player:no:subtitles:loaded');
+                this.vent.trigger('control:stop');
                 return;
             }
             this.stopwatch = Date.now();
-            this.runTimer();
+            this.current = -1;
+            this.next = 0;
+            this.running = true;
+            this.animate();
         },
         stop: function() {
             console.log('received stop');
-            if (this.timer === null) {
-                return;
-            }
-            clearInterval(this.timer);
-            this.timer = null;
+            this.running = false;
         },
         forward: function() {
             console.log('received forward');
@@ -59,138 +98,16 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
             console.log('received back');
         },
         pause: function() {
-            clearInterval(this.timer);
             this.elapsed = Date.now() - this.stopwatch;
             console.log('pausing timer ' + this.elapsed);
-            this.timer = null;
+            this.running = false;
         },
         resume: function() {
             this.stopwatch = Date.now() - this.elapsed;
             console.log('resuming timer from ' + this.elapsed);
-            this.runTimer();
+            this.running = true;
+            this.animate();
         }
-    });
-    var PlayerTextView = Backbone.Marionette.View.extend({
-        el: '.play-text',
-        timer: null,
-        collection: null,
-        initialize: function(opts) {
-            if (opts.vent) {
-                this.vent = opts.vent;
-            } else {
-                throw new Error('vent Event aggregator needed');
-            }
-            if (opts.collection) {
-                this.collection = opts.collection;
-            } else {
-                throw new Error('need subtitle collection');
-            }
-            _.bindAll(this, 'start', 'stop', 'forward', 'back', 'pause', 'resume');
-            this.vent.on('control:start', this.start);
-            this.vent.on('control:stop', this.stop);
-            this.vent.on('control:pause', this.pause);
-            this.vent.on('control:resume', this.resume);
-            this.vent.on('control:forward', this.forward);
-            this.vent.on('control:back', this.back);
-        },
-        pause: function() {
-            clearTimeout(this.timer);
-            this.elapsed = Date.now() - this.stopwatch;
-            console.log('pausing text @ ' + this.elapsed);
-            this.timer = null;
-        },
-        resume: function() {
-            this.stopwatch = Date.now() - this.elapsed;
-            console.log('resuming text from ' + this.elapsed);
-            var playerFn = this.makePlayerFn();
-            var subtitle = this.collection.at(this.index);
-            var nextMs = subtitle.get('start') - this.elapsed;
-            console.log('showing subtitle in ' + nextMs);
-            var self = this;
-            this.timer = setTimeout(function() {
-                playerFn(self.index);
-            }, nextMs);
-        },
-        forward: function() {
-            clearTimeout(this.timer);
-            this.elapsed = Date.now() - this.stopwatch;
-            var index = this.index;
-            var subtitle = this.collection.at(index);
-            var start = subtitle.get('start');
-            subtitle.set('selected', false);
-            var playerFn = this.makePlayerFn();
-            if (this.elapsed < subtitle.get('start')) {
-                this.elapsed = start;
-            } else {
-                index++;
-                subtitle = this.collection.at(index);
-                this.elapsed = subtitle.get('start');
-            }
-            this.stopwatch = Date.now() - this.elapsed;
-            this.vent.trigger('update:stopwatch', this.stopwatch);
-            this.timer = setTimeout(function() {
-                playerFn(index);
-            }, 0);
-        },
-        makePlayerFn: function() {
-            var self = this;
-            var playerFn = (function() {
-                var rawEl = self.$el[0];
-                var start, end, newstart, elapsed;
-                return function(index) {
-                    self.index = index;
-                    var subtitle = self.collection.at(index);
-                    rawEl.innerHTML = subtitle.get('text').join('</br>');
-                    start = subtitle.get('start');
-                    end = subtitle.get('end');
-                    subtitle.set('selected', true);
-                    (function(prevModel) {
-                        setTimeout(function() {
-                            rawEl.innerHTML = '';
-                            prevModel.set('selected', false);
-                        }, end - start);
-                    })(subtitle);
-                    if (self.collection.length === index + 1) {
-                        self.vent.trigger('control:stop');
-                        return;
-                    }
-                    self.index += 1;
-                    subtitle = self.collection.at(self.index);
-                    newstart = subtitle.get('start');
-                    elapsed = Date.now() - self.stopwatch;
-                    self.timer = setTimeout(function() {
-                        playerFn(self.index);
-                    }, newstart - elapsed);
-                };
-            })();
-            return playerFn;
-        },
-        start: function() {
-            if (this.timer !== null) {
-                return;
-            }
-            console.log('starting preview');
-            if (this.collection.length === 0) {
-                this.vent.trigger('player:no:subtitles:loaded');
-                this.vent.trigger('control:stop');
-                return;
-            }
-            this.stopwatch = Date.now();
-            var playerFn = this.makePlayerFn();
-            var subtitle = this.collection.at(0);
-            var nextMs = subtitle.get('start');
-            this.timer = setTimeout(function() {
-                playerFn(0);
-            }, nextMs);
-        },
-        stop: function() {
-            if (this.timer === null) {
-                return;
-            }
-            clearTimeout(this.timer);
-            this.timer = null;
-        },
-        back: function() {},
     });
     var PlayerLayout = Backbone.Marionette.Layout.extend({
         template: '#player-template',
@@ -204,8 +121,7 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
         PlaybackRegion: playbackRegion,
         PlayerControlView: control.PlayerControlView,
         PlayerLayout: PlayerLayout,
-        PlayerTimerView: PlayerTimerView,
-        PlayerTextView: PlayerTextView
+        PlayerTimerView: PlayerTimerView
     };
     return lib;
 });
