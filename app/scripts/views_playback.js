@@ -41,6 +41,10 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
         },
         animate: function() {
             if (this.running) {
+                if (this.current === this.collection.length) {
+                    this.vent.trigger('control:stop');
+                    return;
+                }
                 window.requestAnimationFrame(this.animate);
                 this.drawTimer();
                 this.drawSubtitle();
@@ -85,10 +89,16 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
         },
         stop: function() {
             console.log('received stop');
+            var subtitle = this.collection.at(this.current);
+            subtitle.set('selected', false);
             this.running = false;
         },
         forward: function() {
             console.log('received forward');
+            var subtitle = this.collection.at(this.current);
+            subtitle = this.collection.at(this.current + 1);
+            var elapsed = subtitle.get('start') - 1;
+            this.stopwatch = Date.now() - elapsed;
         },
         stopwatch: function(stopwatch) {
             console.log('received new stopwatch ' + stopwatch);
