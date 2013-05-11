@@ -44,6 +44,18 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
             to: 'unloaded'
         }, {
             name: 'forward',
+            from: 'paused',
+            to: 'paused'
+        }, {
+            name: 'backward',
+            from: 'paused',
+            to: 'paused'
+        }, {
+            name: 'forward',
+            from: 'playing',
+            to: 'playing'
+        }, {
+            name: 'backward',
             from: 'playing',
             to: 'playing'
         }],
@@ -71,7 +83,8 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
                         onstop: self.onstop,
                         onpause: self.onpause,
                         onresume: self.onresume,
-                        onforward: self.onforward
+                        onforward: self.onforward,
+                        onbackward: self.onbackward
                     }
                 });
                 self.vent.on('file:loaded', function() {
@@ -105,7 +118,7 @@ define(['underscore', 'marionette', 'js-state-machine', 'views_subtitle'], funct
             } else if ($target.is('.stop')) {
                 this.fsm.stop();
             } else if ($target.is('.step-backward')) {
-                this.vent.trigger('control:back');
+                this.fsm.backward();
             } else if ($target.is('.step-forward')) {
                 this.fsm.forward();
             }

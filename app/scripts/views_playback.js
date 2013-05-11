@@ -21,14 +21,13 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
             if (opts.collection) {
                 this.collection = opts.collection;
             }
-            _.bindAll(this, 'start', 'stop', 'forward', 'backward', 'pause', 'resume', 'stopwatch', 'animate', 'drawTimer', 'drawSubtitle');
+            _.bindAll(this, 'start', 'stop', 'forward', 'backward', 'pause', 'resume', 'animate', 'drawTimer', 'drawSubtitle');
             this.vent.on('control:start', this.start);
             this.vent.on('control:pause', this.pause);
             this.vent.on('control:resume', this.resume);
             this.vent.on('control:stop', this.stop);
             this.vent.on('control:forward', this.forward);
             this.vent.on('control:backward', this.backward);
-            this.vent.on('update:stopwatch', this.stopwatch);
         },
         timer: null,
         runTimer: function() {
@@ -62,12 +61,14 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
             var start = subtitle.get('start');
             var end = subtitle.get('end');
             if (this.current !== this.next && elapsed >= start && elapsed <= end) {
+                //                console.log('show - current: ' + this.current + ' next: ' + this.next);
                 this.current = this.next;
                 rawEl.innerHTML = subtitle.get('text').join('</br>');
                 rawEl.style.visibility = 'visible';
                 subtitle.set('selected', true);
             } else {
                 if (this.current === this.next && elapsed >= start && elapsed >= end) {
+                    //                   console.log('hide - current: ' + this.current + ' next: ' + this.next);
                     rawEl.style.visibility = 'hidden';
                     subtitle.set('selected', false);
                     this.next += 1;
@@ -95,17 +96,40 @@ define(['underscore', 'marionette', 'models', 'js-state-machine', 'views_playbac
         },
         forward: function() {
             console.log('received forward');
-            var subtitle = this.collection.at(this.current);
-            subtitle = this.collection.at(this.current + 1);
+            var forwardTo = this.current + 1 === this.collection.length ? this.collection.length - 1 : this.current + 1;
+            var subtitle = this.collection.at(forwardTo);
             var elapsed = subtitle.get('start') - 1;
             this.stopwatch = Date.now() - elapsed;
         },
-        stopwatch: function(stopwatch) {
-            console.log('received new stopwatch ' + stopwatch);
-            this.stopwatch = stopwatch;
-        },
         backward: function() {
-            console.log('received back');
+            var now = Date.now();
+            var elapsed = now - this.stopwatch;
+            console.log('received back at ' + elapsed);
+            var curSub, nextSub;
+            if (this.current <= 0) {
+                // near front
+                this.stopwatch = now;
+                this.current = -1;
+                this.next = 0;
+                return;
+            }
+            if (this.current !== this.next) {
+                // outside a subtitle
+                this.current -= 1;
+                this.next -= 1;
+                nextSub = this.collection.at(this.next);
+                elapsed = nextSub.get('start') - 1;
+                this.stopwatch = now - elapsed;
+                return;
+            }
+            // inside a subtitle
+            curSub = this.collection.at(this.current);
+            curSub.set('selected', false);
+            this.current = this.current - 2;
+            this.next = this.current + 1;
+            nextSub = this.collection.at(this.next);
+            elapsed = nextSub.get('start') - 1;
+            this.stopwatch = now - elapsed;
         },
         pause: function() {
             this.elapsed = Date.now() - this.stopwatch;

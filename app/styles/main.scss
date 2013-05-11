@@ -73,7 +73,7 @@ $srt-highlighted-text-color: #000;
 }
 /* Copyright (c) 2012 Dan Eden Animate.css - http://daneden.me/animate Licensed under the ☺ license (http://licence.visualidiot.com/) */
 @mixin keyframes-swing($prefix: '') {
-	20% { #{$prefix}transform: rotate(15deg); opacity:0;}	
+	20% { #{$prefix}transform: rotate(15deg); opacity:1;}	
 	40% { #{$prefix}transform: rotate(-10deg); }
 	60% { #{$prefix}transform: rotate(5deg); }	
 	80% { #{$prefix}transform: rotate(-5deg); }	
